@@ -1,5 +1,6 @@
 package com.example.notes
 
 interface OnClickListener {
-    fun onLongClick(note:Note)
+    fun onChecked(note:Note)
+    fun onLongClick(note:Note, currentAdapter:NoteAdapter)
 }
