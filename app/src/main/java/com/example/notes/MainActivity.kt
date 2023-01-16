@@ -38,12 +38,12 @@ class MainActivity : AppCompatActivity(), OnClickListener {
                 val note = Note(description = binding.etDescription.text.toString().trim())
                 note.id = database.insertNote(note)
 
-                if(note.id != -1L) {
+                if(note.id != Constants.ID_ERROR) {
                     addNoteAuto(note)
                     binding.etDescription.text?.clear()
-                    Snackbar.make(binding.root, "Operacion Exitosa.", Snackbar.LENGTH_SHORT).show()
+                    showMessage(R.string.message_write_db_success)
                 }else{
-                    Snackbar.make(binding.root, "Error al modificar la BD.", Snackbar.LENGTH_SHORT).show()
+                    showMessage(R.string.message_write_db_error)
                 }
 
             } else {
@@ -58,11 +58,13 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     private fun getData(){
-        val data = mutableListOf(
+        /*val data = mutableListOf(
             Note(1,"Estudiar"),
             Note(2, "Ver serie favorita"),
             Note(3, "Comer"),
-            Note(4, "Caminar", true))
+            Note(4, "Caminar", true))*/
+
+        val data = database.getAllNotes()
 
         data.forEach { note ->
             addNoteAuto(note)
@@ -87,8 +89,12 @@ class MainActivity : AppCompatActivity(), OnClickListener {
     }
 
     override fun onChecked(note: Note) {
-        deleteNoteAuto(note)
-        addNoteAuto(note)
+        if(database.updateNote(note)) {
+            deleteNoteAuto(note)
+            addNoteAuto(note)
+        }else{
+            showMessage(R.string.message_write_db_error)
+        }
     }
 
     override fun onLongClick(note: Note, currentAdapter:NoteAdapter) {
@@ -106,5 +112,8 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
     }
 
+    private fun showMessage(msgRes: Int){
+        Snackbar.make(binding.root, getString(msgRes), Snackbar.LENGTH_SHORT).show()
+    }
 
 }
