@@ -5,18 +5,21 @@ import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.notes.databinding.ActivityMainBinding
+import com.google.android.material.snackbar.Snackbar
 
 
 class MainActivity : AppCompatActivity(), OnClickListener {
     private lateinit var binding: ActivityMainBinding
     private lateinit var noteAdapter: NoteAdapter
     private lateinit var notesFinishedAdapter: NoteAdapter
+    private lateinit var database: DatabaseHelper
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        database = DatabaseHelper(this)
 
         noteAdapter = NoteAdapter(mutableListOf(), this)
         binding.rvNotes.apply {
@@ -32,11 +35,16 @@ class MainActivity : AppCompatActivity(), OnClickListener {
 
         binding.btnAdd.setOnClickListener {
             if(binding.etDescription.text.toString().isNotBlank()){
-                val note = Note((noteAdapter.itemCount + 1).toLong(),
-                    binding.etDescription.text.toString().trim())
+                val note = Note(description = binding.etDescription.text.toString().trim())
+                note.id = database.insertNote(note)
 
-                addNoteAuto(note)
-                binding.etDescription.text?.clear()
+                if(note.id != -1L) {
+                    addNoteAuto(note)
+                    binding.etDescription.text?.clear()
+                    Snackbar.make(binding.root, "Operacion Exitosa.", Snackbar.LENGTH_SHORT).show()
+                }else{
+                    Snackbar.make(binding.root, "Error al modificar la BD.", Snackbar.LENGTH_SHORT).show()
+                }
 
             } else {
                 binding.etDescription.error = getString(R.string.validation_field_required)
