@@ -101,7 +101,12 @@ class MainActivity : AppCompatActivity(), OnClickListener {
         val builder = AlertDialog.Builder(this)
             .setTitle(getString(R.string.dialog_title))
             .setPositiveButton(getString(R.string.dialog_ok), { dialogInterface, i ->
-                currentAdapter.remove(note)
+                if(database.deleteNote(note)){
+                    currentAdapter.remove(note)
+                    showMessage(R.string.message_write_db_success)
+                }else{
+                    showMessage(R.string.message_write_db_error)
+                }
             })
             .setNegativeButton(getString(R.string.dialog_cancel), null)
         builder.create().show()

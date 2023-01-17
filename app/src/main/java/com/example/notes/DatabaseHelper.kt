@@ -72,4 +72,13 @@ class DatabaseHelper(context : Context): SQLiteOpenHelper(context, Constants.DAT
 
         return result == Constants.TRUE
     }
+
+    fun deleteNote(note: Note) : Boolean{
+        val database = this.writableDatabase
+        val result = database.delete(Constants.ENTITY_NOTE,
+            "${Constants.PROPERTY_ID} == ${note.id}",
+            null)
+
+        return  result == Constants.TRUE
+    }
 }
